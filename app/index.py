@@ -127,17 +127,16 @@ def sensor_update():
         print("Parsed JSON data:", data)
         
         # Validate the data has required fields
-        required_fields = ['temperature', 'humidity', 'light']
+        required_fields = ['temp', 'humd', 'light']
         if not all(field in data for field in required_fields):
             print("Missing required fields")
             return jsonify({"error": "Missing required sensor data"}), 400
 
         # Create response with status for each sensor
-        # if data is not None:
         response_data = {
             'sensor_data': {
-                'temperature': float(data['temperature']),
-                'humidity': float(data['humidity']),
+                'temperature': float(data['temp']),
+                'humidity': float(data['humd']),
                 'light': float(data['light'])
             },
             'status': {
@@ -149,11 +148,12 @@ def sensor_update():
         }
         
         print("Sending response:", response_data)
-        return jsonify(response_data)
+
+        return render_template('index.html', data=response_data)
 
     except Exception as e:
         print(f"Error processing request: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=80)

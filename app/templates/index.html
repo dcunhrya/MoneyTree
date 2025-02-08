@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Monitor</title>
     <style>
+        /* ... keeping all your existing styles ... */
         * {
             margin: 0;
             padding: 0;
@@ -43,7 +44,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Status colors */
         .status-good {
             background-color: #dcfce7;
             border: 1px solid #22c55e;
@@ -86,42 +86,50 @@
 <body>
     <div class="container">
         <div class="personality-box">
-            <p id="personality-text">Loading plant personality...</p>
-            <p class="timestamp" id="update-time"></p>
+            <p id="personality-text">{{ data.personality if data else "Waiting for plant data..." }}</p>
+            <p class="timestamp" id="update-time">Last updated: {{ data.timestamp if data else "" }}</p>
         </div>
-
+    
         <div class="sensor-grid">
-            <div class="sensor-box" id="temperature-box">
+            <div class="sensor-box" id="temperature-box" class="{{ 'status-' + data.status.temperature if data else '' }}">
                 <div class="sensor-label">Temperature</div>
-                <div class="sensor-value"><span id="temperature-value">--</span>°C</div>
+                <div class="sensor-value">
+                    <span id="temperature-value">{{ "%.1f"|format(data.sensor_data.temperature) if data else "--" }}</span>°C
+                </div>
             </div>
-
-            <div class="sensor-box" id="humidity-box">
+    
+            <div class="sensor-box" id="humidity-box" class="{{ 'status-' + data.status.humidity if data else '' }}">
                 <div class="sensor-label">Humidity</div>
-                <div class="sensor-value"><span id="humidity-value">--</span>%</div>
+                <div class="sensor-value">
+                    <span id="humidity-value">{{ "%.1f"|format(data.sensor_data.humidity) if data else "--" }}</span>%
+                </div>
             </div>
-
-            <div class="sensor-box" id="light-box">
+    
+            <div class="sensor-box" id="light-box" class="{{ 'status-' + data.status.light if data else '' }}">
                 <div class="sensor-label">Light</div>
-                <div class="sensor-value"><span id="light-value">--</span> lux</div>
+                <div class="sensor-value">
+                    <span id="light-value">{{ "%.1f"|format(data.sensor_data.light) if data else "--" }}</span> lux
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
+    <!-- <script>
+        // Function to update the UI with sensor data
         function updateSensorStatus(data) {
             // Update values
-            document.getElementById('temperature-value').textContent = data.sensor_data.temperature;
-            document.getElementById('humidity-value').textContent = data.sensor_data.humidity;
-            document.getElementById('light-value').textContent = data.sensor_data.light;
+            document.getElementById('temperature-value').textContent = 
+                parseFloat(data.sensor_data.temperature).toFixed(1);
+            document.getElementById('humidity-value').textContent = 
+                parseFloat(data.sensor_data.humidity).toFixed(1);
+            document.getElementById('light-value').textContent = 
+                parseFloat(data.sensor_data.light).toFixed(1);
 
             // Update status colors
             const sensors = ['temperature', 'humidity', 'light'];
             sensors.forEach(sensor => {
                 const box = document.getElementById(`${sensor}-box`);
-                // Remove all status classes
                 box.classList.remove('status-good', 'status-ok', 'status-bad');
-                // Add appropriate status class
                 box.classList.add(`status-${data.status[sensor]}`);
             });
 
@@ -130,18 +138,10 @@
                 `Last updated: ${new Date().toLocaleTimeString()}`;
         }
 
-        // Poll for updates every second
-        setInterval(() => {
-            fetch('/api/sensor-update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => updateSensorStatus(data))
-            .catch(error => console.error('Error:', error));
-        }, 1000);
-    </script>
+        // Function to handle errors
+        function handleError(error) {
+            console.error('Error:', error);
+        }
+    </script> -->
 </body>
 </html>
